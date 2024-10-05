@@ -1,0 +1,83 @@
+# 推箱子游戏
+
+# 初始化游戏地图
+# 使用 'P' 表示玩家，'B' 表示箱子，'G' 表示目标位置，'W' 表示墙壁，'.' 表示空地
+game_map = [
+    ['W', 'W', 'W', 'W', 'W'],
+    ['W', 'P', '.', 'B', 'W'],
+    ['W', '.', '.', '.', 'W'],
+    ['W', 'W', 'W', 'G', 'W'],
+    ['W', 'W', 'W', 'W', 'W']
+]
+
+# 玩家的初始位置
+player_position = [1, 1]
+
+# 目标位置
+goal_positions = [
+    [3, 4]
+]
+
+# 检查游戏是否胜利
+def check_win():
+    for goal in goal_positions:
+        if game_map[goal[0]][goal[1]] != 'B':
+            return False
+    return True
+
+# 打印游戏地图
+def print_map():
+    for row in game_map:
+        row_str = ""
+        for cell in row:
+            if [i, j] == player_position and cell == 'P':
+                row_str += 'P '
+            else:
+                row_str += cell + ' '
+        print(row_str)
+    print()
+
+# 移动玩家
+def move_player(direction):
+    global player_position
+    x, y = player_position
+    if direction == 'w':  # 上
+        new_x, new_y = x - 1, y
+    elif direction == 's':  # 下
+        new_x, new_y = x + 1, y
+    elif direction == 'a':  # 左
+        new_x, new_y = x, y - 1
+    elif direction == 'd':  # 右
+        new_x, new_y = x, y + 1
+
+    # 检查新位置是否为墙壁
+    if game_map[new_x][new_y] == 'W':
+        return
+
+    # 检查新位置是否为箱子
+    if game_map[new_x][new_y] == 'B':
+        # 检查箱子的下一个位置是否为墙壁或玩家
+        if game_map[new_x + (new_x - x)][new_y + (new_y - y)] == 'W' or game_map[new_x + (new_x - x)][new_y + (new_y - y)] == 'P':
+            return
+        else:
+            # 移动箱子
+            game_map[new_x][new_y] = 'B'
+            game_map[new_x + (new_x - x)][new_y + (new_y - y)] = '.'
+            game_map[x][y] = '.'
+
+    # 移动玩家
+    game_map[x][y] = '.'
+    game_map[new_x][new_y] = 'P'
+    player_position = [new_x, new_y]
+
+# 游戏主循环
+while True:
+    print_map()
+    if check_win():
+        print("Congratulations! You won!")
+        break
+    move = input("Move (w/a/s/d): ").lower()
+    if move in ['w', 'a', 's', 'd']:
+        move_player(move)
+    else:
+        print("Invalid move. Use 'w', 'a', 's', or 'd'.")
